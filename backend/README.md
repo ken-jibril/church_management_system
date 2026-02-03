@@ -58,3 +58,22 @@ It handles members, districts, church groups, leadership roles, and permissions.
 - Elders / Deacons → district-level access
 - Group Leaders → group-level access
 - Members → limited access
+
+## Optional / Future Models
+### NewMemberRegistration
+
+- Track pending members before approval
+
+- Fields: first_name, last_name, email, phone_number, group/district (optional), status, created_at
+
+- Media / Admin Logs
+
+- Track who updated what and when
+
+- Fields: user (FK → Member), action, model_name, timestamp
+
+- Event / Attendance / Service Tracking
+
+- Track church services, events, and attendance
+
+- Fields: event_name, date & time, participants (ManyToMany → Member), attendance status
