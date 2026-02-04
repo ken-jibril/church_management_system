@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import serializers
+from rest_framework import serializers, mixins
 
 
 from members.models import Member
@@ -127,12 +127,13 @@ class MemberRegistrationSerializer(serializers.ModelSerializer):
         return member
 
 
-class MemberRegistrationViewSet(viewsets.GenericViewSet):
+class MemberRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+
     serializer_class = MemberRegistrationSerializer
     permission_classes = [permissions.AllowAny]  # anyone can register
 
-    @action(detail=False, methods=["post"])
-    def register(self, request):
+    def create(self, request):
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         member = serializer.save()
