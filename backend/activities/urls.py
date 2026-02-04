@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     NewMemberRegistrationViewSet,
+    MemberRegistrationViewSet,
     EventViewSet,
     AttendanceViewSet
 )
@@ -9,6 +10,7 @@ from .views import (
 # Create a router and register all viewsets
 router = DefaultRouter()
 router.register(r'new-members', NewMemberRegistrationViewSet, basename='new-member')
+router.register(r"register", MemberRegistrationViewSet, basename="register")
 router.register(r'events', EventViewSet, basename='event')
 router.register(r'attendance', AttendanceViewSet, basename='attendance')
 
