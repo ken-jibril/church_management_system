@@ -21,10 +21,11 @@ class NewMemberRegistrationAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        # Only show pending by default (huge admin W)
-        if not request.user.is_superuser:
-            return qs.filter(status="pending")
-        return qs
+        if request.user.is_super_admin:
+            return qs  # full view for you
+        # Parish minister + Kirk Session see approved/rejected only
+        return qs.exclude(status='pending')
+
 
     def has_delete_permission(self, request, obj=None):
         # Nobody deletes registrations — ever
