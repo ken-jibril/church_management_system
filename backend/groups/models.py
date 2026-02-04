@@ -15,7 +15,7 @@ class Group(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f"{self.name} (Patron: {self.patron})"
 
 
 class GroupLeadership(models.Model):

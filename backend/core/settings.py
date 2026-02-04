@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'districts',
     'groups',
     'members',
+    'activities'
 ]
 
 MIDDLEWARE = [
