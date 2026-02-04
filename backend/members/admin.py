@@ -45,15 +45,19 @@ class MemberAdmin(UserAdmin):
 
     search_fields = ('username', 'first_name', 'last_name', 'phone_number')
 
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
 
-        # Add total members and district breakdown for leaders
-        extra_context["total_members"] = Member.objects.count()
-        extra_context["by_district"] = (
-            Member.objects
-            .values("district__name")
-            .annotate(count=Count("id"))
-        )
+        # Super admin sees everything
+        if request.user.is_super_admin:
+            return qs
 
-        return super().changelist_view(request, extra_context=extra_context)
+        # Parish minister and Kirk session see all members (overview)
+        if request.user.is_parish_minister or request.user.is_kirk_session:
+            return qs
+
+        # Regular members: limit to their groups and basic member info
+        return qs.filter(
+            groups__in=request.user.groups.all()  # only members in the same groups
+        ).distinct()
+
