@@ -5,36 +5,24 @@ from .models import NewMemberRegistration, AdminLog, Event, Attendance
 @admin.register(NewMemberRegistration)
 class NewMemberRegistrationAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'phone_number', 'email', 'status', 'district', 'preferred_group', 'created_at')
-    list_filter = ('status', 'district', 'preferred_group', 'created_at')
+    list_filter = ('status', 'district',)
     search_fields = ('first_name', 'last_name', 'phone_number', 'email')
+    readonly_fields = ("status", "created_at")
+
     actions = ['approve_selected', 'reject_selected']
 
     def approve_selected(self, request, queryset):
-        """
-        Approve multiple selected pending members.
-        Only super admin or delegated user should perform this.
-        """
-        from members.models import Member
+        for registration in queryset.filter(status="pending"):
+            registration.approve(request.user)
 
-        for registration in queryset:
-            try:
-                registration.approve(request.user)
-                self.message_user(request, f"Approved {registration.first_name} {registration.last_name}")
-            except PermissionError as e:
-                self.message_user(request, f"Cannot approve {registration.first_name}: {str(e)}", level='error')
-    approve_selected.short_description = "Approve selected pending members"
+    approve_selected.short_description = "Approve selected registrations"
+
 
     def reject_selected(self, request, queryset):
-        """
-        Reject multiple selected pending members.
-        """
-        for registration in queryset:
-            try:
-                registration.reject(request.user)
-                self.message_user(request, f"Rejected {registration.first_name} {registration.last_name}")
-            except PermissionError as e:
-                self.message_user(request, f"Cannot reject {registration.first_name}: {str(e)}", level='error')
-    reject_selected.short_description = "Reject selected pending members"
+        for registration in queryset.filter(status="pending"):
+            registration.reject(request.user)
+
+    reject_selected.short_description = "Reject selected registrations"
 
 
 # 🔹 Admin for AdminLog
