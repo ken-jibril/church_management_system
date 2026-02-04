@@ -1,12 +1,20 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from members.models import Member
-from .models import NewMemberRegistration
-from .serializers import NewMemberRegistrationSerializer, MemberSerializer
-from .models import AdminLog
+from .models import NewMemberRegistration, AdminLog, Event, Attendance
+from .serializers import (
+    NewMemberRegistrationSerializer,
+    MemberSerializer,
+    EventSerializer,
+    AttendanceSerializer
+)
 
 
+# -------------------------
+# New Member Registration
+# -------------------------
 class NewMemberRegistrationViewSet(viewsets.ModelViewSet):
     queryset = NewMemberRegistration.objects.all()
     serializer_class = NewMemberRegistrationSerializer
@@ -15,10 +23,10 @@ class NewMemberRegistrationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         qs = super().get_queryset()
-        # Admins see all
+        # Admins see all registrations
         if user.is_super_admin or user.can_approve_pending:
             return qs
-        # Regular members see only approved
+        # Regular members see only approved registrations
         return qs.filter(status="approved")
 
     # -------------------------
@@ -56,3 +64,36 @@ class NewMemberRegistrationViewSet(viewsets.ModelViewSet):
         return Response({
             'message': f'{registration.first_name} {registration.last_name} rejected!'
         })
+
+
+# -------------------------
+# Event
+# -------------------------
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+        # Admins and members see all events
+        return qs
+
+
+# -------------------------
+# Attendance
+# -------------------------
+class AttendanceViewSet(viewsets.ModelViewSet):
+    queryset = Attendance.objects.all()
+    serializer_class = AttendanceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+        # Admins and approvers see all attendance
+        if user.is_super_admin or user.can_approve_pending:
+            return qs
+        # Regular members: only their own attendance records
+        return qs.filter(member=user)
