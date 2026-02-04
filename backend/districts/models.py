@@ -1,5 +1,4 @@
 from django.db import models
-from members.models import Member
 
 class District(models.Model):
     """
@@ -9,30 +8,32 @@ class District(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     elder = models.ForeignKey(
-        Member,
+        'members.Member',  # string reference avoids circular import
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='elder_district'
     )
     secretary = models.ForeignKey(
-        Member,
+        'members.Member',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='district_secretary'
     )
     treasurer = models.ForeignKey(
-        Member,
+        'members.Member',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='district_treasurer'
     )
 
     deacons = models.ManyToManyField(
-        Member,
+        'members.Member',
         related_name='district_deacons',
         blank=True
     )
 
     def __str__(self):
         return self.name
-
