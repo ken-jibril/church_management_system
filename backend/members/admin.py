@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Count
 from .models import Member
 
 
@@ -43,3 +44,16 @@ class MemberAdmin(UserAdmin):
     )
 
     search_fields = ('username', 'first_name', 'last_name', 'phone_number')
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+
+        # Add total members and district breakdown for leaders
+        extra_context["total_members"] = Member.objects.count()
+        extra_context["by_district"] = (
+            Member.objects
+            .values("district__name")
+            .annotate(count=Count("id"))
+        )
+
+        return super().changelist_view(request, extra_context=extra_context)
