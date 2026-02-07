@@ -1,17 +1,26 @@
-from django.shortcuts import render, redirect
-from .forms import MemberRegistrationForm
+# members/views.py
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Member
+from .serializers import MemberSerializer
 
-def register_member(request):
-    if request.method == 'POST':
-        form = MemberRegistrationForm(request.POST)
-        if form.is_valid():
-            member = form.save(commit=False)
-            # Default roles for new members
-            member.is_super_admin = False
-            member.is_parish_minister = False
-            member.is_kirk_session = False
-            member.save()
-            return redirect('login')  # or wherever you want
-    else:
-        form = MemberRegistrationForm()
-    return render(request, 'members/register.html', {'form': form})
+class MemberRegistrationViewSet(viewsets.GenericViewSet):
+    serializer_class = MemberSerializer
+    permission_classes = [permissions.AllowAny]  # anyone can register
+
+    @action(detail=False, methods=["post"])
+    def register(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Create user with hashed password
+        password = serializer.validated_data.pop("password")
+        member = Member.objects.create_user(**serializer.validated_data)
+        member.set_password(password)
+        member.save()
+
+        return Response({
+            "message": "Account created successfully!",
+            "member": MemberSerializer(member).data,
+        }, status=status.HTTP_201_CREATED)
