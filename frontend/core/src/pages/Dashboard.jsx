@@ -1,27 +1,23 @@
 import { useEffect, useState } from "react";
-import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [members, setMembers] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const membersRes = await API.get("/new-members/");
-        const eventsRes = await API.get("/events/");
-        setMembers(membersRes.data);
-        setEvents(eventsRes.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
+    // MOCK data
+    setMembers([
+      { id: 1, first_name: "Ken", last_name: "Jibril", status: "active" },
+      { id: 2, first_name: "Zen", last_name: "Assistant", status: "active" },
+    ]);
+    setEvents([
+      { id: 1, name: "Sunday Service", date: "2026-02-08" },
+      { id: 2, name: "Choir Practice", date: "2026-02-09" },
+    ]);
+    setLoading(false);
   }, []);
 
   if (loading) return <p>Loading...</p>;
@@ -29,6 +25,7 @@ export default function Dashboard() {
   return (
     <div>
       <h2>Welcome, {user?.first_name} 👋</h2>
+      <button onClick={logout}>Logout</button>
 
       <h3>Members</h3>
       <ul>

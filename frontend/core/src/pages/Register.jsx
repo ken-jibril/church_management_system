@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import { registerUser } from "../services/auth";
 import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
@@ -24,14 +24,13 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await api.post("/members/register/", formData); // or "/api/members/register/" if you update backend
-      login(response.data.member); 
+      const data = await registerUser(formData);
+      login(data);
       navigate("/dashboard");
     } catch (err) {
-      console.log(err.response);
-      setError(err.response?.data?.detail || "Registration failed");
+      setError("Registration failed");
+      console.error(err);
     }
   };
 
@@ -39,12 +38,16 @@ export default function Register() {
     <div>
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="username" placeholder="Username" value={formData.username} onChange={handleChange} required />
-        <input type="text" name="first_name" placeholder="First Name" value={formData.first_name} onChange={handleChange} required />
-        <input type="text" name="last_name" placeholder="Last Name" value={formData.last_name} onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
-        <input type="text" name="phone_number" placeholder="Phone Number" value={formData.phone_number} onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
+        {Object.keys(formData).map((key) => (
+          <input
+            key={key}
+            name={key}
+            placeholder={key.replace("_", " ")}
+            value={formData[key]}
+            onChange={handleChange}
+            required
+          />
+        ))}
         <button type="submit">Register</button>
         {error && <p style={{ color: "red" }}>{error}</p>}
       </form>

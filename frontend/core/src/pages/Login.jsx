@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../api/axios";
+import { loginUser } from "../services/auth";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -13,38 +13,25 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await API.post("/register/login/", { username, password });
-      // This assumes your backend returns user info + token
-      login(response.data); 
+      const data = await loginUser({ username, password });
+      login(data);
       navigate("/dashboard");
     } catch (err) {
-      console.log(err.response);
-      setError(err.response?.data?.detail || "Login failed");
+      setError("Login failed");
+      console.error(err);
     }
   };
 
   return (
     <div>
-      <h1>LOGIN PAGE IS WORKING 🔥</h1>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="">Username</label>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <label htmlFor="">Password</label>
+        <input value={username} onChange={(e) => setUsername(e.target.value)} />
         <input
           type="password"
-          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
         />
         <button type="submit">Login</button>
         {error && <p style={{ color: "red" }}>{error}</p>}

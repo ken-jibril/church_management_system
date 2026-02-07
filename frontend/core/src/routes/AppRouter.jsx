@@ -6,17 +6,25 @@ import ProtectedRoute from "./ProtectedRoute";
 import Navbar from "../components/Navbar";
 
 export default function AppRouter() {
+
+
   return (
     <BrowserRouter>
-    <Navbar />
+      <Navbar />
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
+
+        {/* Protected routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
