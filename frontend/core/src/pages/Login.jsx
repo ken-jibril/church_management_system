@@ -27,6 +27,7 @@ export default function Login() {
 
   return (
     <div>
+      <h1>LOGIN PAGE IS WORKING 🔥</h1>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="">Username</label>

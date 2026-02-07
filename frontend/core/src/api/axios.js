@@ -1,12 +1,13 @@
 import axios from "axios";
 
-const API = axios.create({
-  baseURL: "https://church-management-system-k7bt.onrender.com/api", // your deployed backend
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// Attach token automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
   if (token) {
@@ -15,4 +16,4 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export default API;
+export default api;
