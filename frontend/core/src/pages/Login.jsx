@@ -1,41 +1,57 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/auth";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
-  const navigate = useNavigate();
+const Login = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+
     try {
-      const data = await loginUser({ username, password });
-      login(data);
+      await login(formData);
       navigate("/dashboard");
     } catch (err) {
-      setError("Login failed");
-      console.error(err);
+      setError("Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input value={username} onChange={(e) => setUsername(e.target.value)} />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Login</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Email"
+        onChange={(e) =>
+          setFormData({ ...formData, email: e.target.value })
+        }
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) =>
+          setFormData({ ...formData, password: e.target.value })
+        }
+      />
+
+      {error && <p>{error}</p>}
+
+      <button disabled={loading}>
+        {loading ? "Logging in..." : "Login"}
+      </button>
+    </form>
   );
-}
+};
+
+export default Login;

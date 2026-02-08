@@ -1,45 +1,88 @@
 import { useEffect, useState } from "react";
+import { getMembers } from "../services/memberService";
+import { getActivities } from "../services/activityService";
 import { useAuth } from "../context/AuthContext";
+import StatCard from "../components/StatCard";
+import RecentMembers from "../components/RecentMembers";
+import RecentActivities from "../components/RecentActivities";
 
-export default function Dashboard() {
+const Dashboard = () => {
   const { user, logout } = useAuth();
+
   const [members, setMembers] = useState([]);
-  const [events, setEvents] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // MOCK data
-    setMembers([
-      { id: 1, first_name: "Ken", last_name: "Jibril", status: "active" },
-      { id: 2, first_name: "Zen", last_name: "Assistant", status: "active" },
-    ]);
-    setEvents([
-      { id: 1, name: "Sunday Service", date: "2026-02-08" },
-      { id: 2, name: "Choir Practice", date: "2026-02-09" },
-    ]);
-    setLoading(false);
+    const loadDashboard = async () => {
+      try {
+        const [membersData, activitiesData] = await Promise.all([
+          getMembers(),
+          getActivities(),
+        ]);
+
+        setMembers(membersData || []);
+        setActivities(activitiesData || []);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h2>Welcome, {user?.first_name} 👋</h2>
-      <button onClick={logout}>Logout</button>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-xl font-semibold text-gray-800">
+            Dashboard
+          </h1>
+          <p className="text-sm text-gray-500">
+            Welcome back, {user?.email}
+          </p>
+        </div>
 
-      <h3>Members</h3>
-      <ul>
-        {members.map((m) => (
-          <li key={m.id}>{m.first_name} {m.last_name} ({m.status})</li>
-        ))}
-      </ul>
+        <button
+          onClick={logout}
+          className="text-sm text-red-600 font-medium"
+        >
+          Logout
+        </button>
+      </div>
 
-      <h3>Events</h3>
-      <ul>
-        {events.map((e) => (
-          <li key={e.id}>{e.name} - {e.date}</li>
-        ))}
-      </ul>
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+          {error}
+        </div>
+      )}
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <StatCard title="Members" value={members.length} />
+        <StatCard title="Activities" value={activities.length} />
+      </div>
+
+      {/* Lists */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <RecentMembers members={members} />
+        <RecentActivities activities={activities} />
+      </div>
     </div>
   );
-}
+};
+
+export default Dashboard;
