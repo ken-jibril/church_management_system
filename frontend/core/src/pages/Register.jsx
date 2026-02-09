@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../services/authService";
+import { registerUser } from "../services/authService.js";
 import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
@@ -26,7 +26,10 @@ export default function Register() {
     e.preventDefault();
     try {
       const data = await registerUser(formData);
-      login(data);
+      await login({
+        email: formData.email,
+        password: formData.password,
+      });
       navigate("/dashboard");
     } catch (err) {
       setError("Registration failed");
