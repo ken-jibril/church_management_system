@@ -8,4 +8,13 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+
+  server: {
+    proxy: {
+      '/auth': 'https://church-management-system-k7bt.onrender.com',
+      '/members': 'https://church-management-system-k7bt.onrender.com',
+      '/activities': 'https://church-management-system-k7bt.onrender.com',
+    }
+  }
 })
+
