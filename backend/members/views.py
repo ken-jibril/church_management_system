@@ -1,5 +1,5 @@
 # members/views.py
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Member
@@ -52,3 +52,7 @@ class MemberViewSet(viewsets.ModelViewSet):
                 status=403
             )
         return super().destroy(request, *args, **kwargs)
+
+class RegisterView(generics.CreateAPIView):
+    queryset = Member.objects.all()
+    serializer_class = MemberSerializer

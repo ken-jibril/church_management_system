@@ -22,6 +22,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from members.serializers import MemberSerializer
+from members.views import RegisterView
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -32,9 +33,10 @@ class MeView(APIView):
 
 urlpatterns = [
     path("", home),
-
     path('admin/', admin.site.urls),
+
     #JWT
+    path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/me/', MeView.as_view(), name='me'),
