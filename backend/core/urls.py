@@ -17,10 +17,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .views import home
+from rest_framework_simplejwt.views import ( TokenObtainPairView, TokenRefreshView,)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from members.serializers import MemberSerializer
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = MemberSerializer(request.user)
+        return Response(serializer.data)
 
 urlpatterns = [
     path("", home),
+
     path('admin/', admin.site.urls),
-    path('api/', include('members.urls')),
-    path('api/activities/', include('activities.urls')),
+    #JWT
+    path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/me/', MeView.as_view(), name='me'),
+
+    path('members/', include('members.urls')),
+    path('activities/', include('activities.urls')),
 ]
