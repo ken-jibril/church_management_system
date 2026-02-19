@@ -23,15 +23,18 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  const login = async (credentials) => {
-    const data = await loginUser(credentials);
+const login = async (credentials) => {
+  const data = await loginUser(credentials);
 
-    // assuming backend returns access token
-    localStorage.setItem("accessToken", data.access);
-    setUser(data.user || null);
+  localStorage.setItem("accessToken", data.access);
 
-    return data;
-  };
+  // Fetch real user info
+  const userData = await getCurrentUser();
+  setUser(userData);
+
+  return data;
+};
+
 
   const register = async (payload) => {
     const data = await registerUser(payload);
