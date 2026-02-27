@@ -208,6 +208,19 @@ const Login = () => {
               </div>
             )}
           </div>
+
+          {/* Registration link */}
+          <div className="mt-4 text-center">
+            <p className="text-xs text-indigo-300">
+              Don't have an account?{" "}
+              <a 
+                href="/register" 
+                className="text-indigo-400 hover:text-indigo-300 font-medium underline"
+              >
+                Register here
+              </a>
+            </p>
+          </div>
         </div>
 
         {/* Footer */}

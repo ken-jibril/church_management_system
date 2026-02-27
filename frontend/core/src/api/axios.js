@@ -1,12 +1,9 @@
 import axios from "axios";
 
-// Use relative URLs for Vite proxy in development, full URL for production
-const isDevelopment = import.meta.env.DEV;
-const API_BASE_URL = isDevelopment 
-  ? ""  
-  : (import.meta.env.VITE_API_BASE_URL || "https://church-management-system-k7bt.onrender.com");
+// Use direct backend URL for now (bypassing proxy to test)
+const API_BASE_URL = "https://church-management-system-k7bt.onrender.com";
 
-console.log("API Base URL:", API_BASE_URL, "Is Dev:", isDevelopment);
+console.log("API Base URL:", API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,

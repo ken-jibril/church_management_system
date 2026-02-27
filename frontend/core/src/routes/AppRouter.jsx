@@ -8,6 +8,7 @@ import ProtectedRoute, { RoleProtectedRoute } from "./ProtectedRoute";
 
 // Pages
 import Login from "../pages/Login";
+import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
 import Members from "../pages/Members";
 import Donations from "../pages/Donations";
@@ -61,6 +62,15 @@ export default function AppRouter() {
           element={
             <RedirectIfAuthenticated>
               <Login />
+            </RedirectIfAuthenticated>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <RedirectIfAuthenticated>
+              <Register />
             </RedirectIfAuthenticated>
           }
         />
