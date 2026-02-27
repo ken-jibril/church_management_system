@@ -1,49 +1,98 @@
+/**
+ * AuthContext - Covenant Cloud Church Management System
+ * Handles authentication and user session management via JWT
+ */
 import { createContext, useContext, useEffect, useState } from "react";
-import { loginUser, registerUser, getCurrentUser } from "../services/authService.js";
+import { hasPermission } from "./RBACContext";
+import { loginUser, getCurrentUser } from "../services/authService";
 
 const AuthContext = createContext();
+
+/**
+ * Map backend Member fields → frontend role string used by RBAC.
+ * Backend flags: is_super_admin, is_parish_minister, is_kirk_session
+ * Frontend roles: superadmin | pastor | elder | member
+ */
+const deriveRole = (member) => {
+  if (member.is_super_admin || member.is_superuser) return "superadmin";
+  if (member.is_parish_minister) return "pastor";
+  if (member.is_kirk_session) return "elder";
+  return "member";
+};
+
+/**
+ * Normalise a raw backend Member object into the shape the frontend expects.
+ */
+const normaliseMember = (raw) => ({
+  id: raw.id,
+  name: `${raw.first_name} ${raw.last_name}`.trim() || raw.username,
+  email: raw.email,
+  username: raw.username,
+  phone: raw.phone_number || "",
+  role: deriveRole(raw),
+  // keep raw flags for fine-grained checks
+  is_super_admin: raw.is_super_admin,
+  is_parish_minister: raw.is_parish_minister,
+  is_kirk_session: raw.is_kirk_session,
+  can_approve_pending: raw.can_approve_pending,
+  district: raw.district,
+  avatar: null,
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user on app start
+  // On app start: restore session from localStorage tokens
   useEffect(() => {
-    const loadUser = async () => {
+    const restoreSession = async () => {
       try {
-        const data = await getCurrentUser();
-        setUser(data);
-      } catch (error) {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+          setLoading(false);
+          return;
+        }
+        // Fetch current user from /auth/me/ (interceptor attaches token)
+        const raw = await getCurrentUser();
+        setUser(normaliseMember(raw));
+      } catch {
+        // Token invalid / expired — clear everything
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("covenantcloud_user");
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-
-    loadUser();
+    restoreSession();
   }, []);
 
-const login = async (credentials) => {
-  const data = await loginUser(credentials);
+  const login = async (credentials) => {
+    // POST /auth/login/ → { access, refresh }
+    const tokenData = await loginUser(credentials);
+    localStorage.setItem("accessToken", tokenData.access);
+    localStorage.setItem("refreshToken", tokenData.refresh);
 
-  localStorage.setItem("accessToken", data.access);
-
-  // Fetch real user info
-  const userData = await getCurrentUser();
-  setUser(userData);
-
-  return data;
-};
-
-
-  const register = async (payload) => {
-    const data = await registerUser(payload);
-    return data;
+    // Fetch full user profile
+    const raw = await getCurrentUser();
+    const normalised = normaliseMember(raw);
+    localStorage.setItem("covenantcloud_user", JSON.stringify(normalised));
+    setUser(normalised);
+    return normalised;
   };
 
   const logout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("covenantcloud_user");
     setUser(null);
+  };
+
+  // Check if current user has permission for an action on a module
+  const can = (module, action) => {
+    if (!user) return false;
+    return hasPermission(user.role, module, action);
   };
 
   return (
@@ -51,10 +100,11 @@ const login = async (credentials) => {
       value={{
         user,
         login,
-        register,
         logout,
         isAuthenticated: !!user,
         loading,
+        can,
+        role: user?.role || null,
       }}
     >
       {children}
