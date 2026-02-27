@@ -18,11 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from .views import home
 from rest_framework_simplejwt.views import ( TokenObtainPairView, TokenRefreshView,)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from members.serializers import MemberSerializer
-from members.views import RegisterView
+from members.views import MemberRegistrationViewSet
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -35,8 +35,8 @@ urlpatterns = [
     path("", home),
     path('admin/', admin.site.urls),
 
-    #JWT
-    path('auth/register/', RegisterView.as_view(), name='register'),
+    #JWT - Use working MemberRegistrationViewSet
+    path('auth/register/', MemberRegistrationViewSet.as_view({'post': 'register'}), name='register'),
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/me/', MeView.as_view(), name='me'),
