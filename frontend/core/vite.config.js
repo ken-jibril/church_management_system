@@ -10,10 +10,23 @@ export default defineConfig({
   ],
 
   server: {
+    port: 5174, // Force default Vite port
     proxy: {
-      '/auth': 'https://church-management-system-k7bt.onrender.com',
-      '/members': 'https://church-management-system-k7bt.onrender.com',
-      '/activities': 'https://church-management-system-k7bt.onrender.com',
+      '/auth': {
+        target: 'https://church-management-system-k7bt.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
+      '/members': {
+        target: 'https://church-management-system-k7bt.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
+      '/activities': {
+        target: 'https://church-management-system-k7bt.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
     }
   }
 })
