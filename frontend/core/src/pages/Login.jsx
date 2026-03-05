@@ -41,12 +41,22 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+    
+    // Convert email to username for Django JWT
+    const loginData = {
+      username: formData.email,  // Use email as username
+      password: formData.password
+    };
+    
+    console.log("Login data:", loginData);
+    
     try {
-      await login(formData);
+      await login(loginData);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Invalid email or password. Please try again.");
+      const errorMsg = err.response?.data?.detail || err.message || "Invalid credentials. Please check your username and password.";
+      console.error("Login error:", err);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
