@@ -12,9 +12,13 @@ class MemberRegistrationViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=["post"])
     def register(self, request):
+        print(f"Registration request data: {request.data}")
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+        print(f"Serializer is valid: {serializer.is_valid()}")
+        if not serializer.is_valid():
+            print(f"Serializer errors: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
         # Create user with hashed password
         password = serializer.validated_data.pop("password")
         member = Member.objects.create_user(**serializer.validated_data)
