@@ -22,7 +22,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from members.serializers import MemberSerializer
-from members.views import MemberRegistrationViewSet
+from members.views import MemberRegistrationViewSet, MemberViewSet
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -30,6 +30,66 @@ class MeView(APIView):
     def get(self, request):
         serializer = MemberSerializer(request.user)
         return Response(serializer.data)
+
+class PromoteToSuperAdminView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        user.is_super_admin = True
+        user.can_approve_pending = True
+        user.save()
+        return Response({
+            "message": "You have been promoted to superadmin",
+            "user": MemberSerializer(user).data
+        })
+
+class SetUserRoleView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        if not request.user.is_super_admin:
+            return Response(
+                {"detail": "Only superadmin can set roles"},
+                status=403
+            )
+        
+        user_id = request.data.get('user_id')
+        role = request.data.get('role')
+        
+        if not user_id or not role:
+            return Response(
+                {"detail": "user_id and role are required"},
+                status=400
+            )
+            
+        try:
+            from members.models import Member
+            target_user = Member.objects.get(id=user_id)
+            
+            # Reset all roles
+            target_user.is_parish_minister = False
+            target_user.is_kirk_session = False
+            target_user.is_super_admin = False
+            
+            # Set new role
+            if role == 'pastor':
+                target_user.is_parish_minister = True
+            elif role == 'elder':
+                target_user.is_kirk_session = True
+            elif role == 'superadmin':
+                target_user.is_super_admin = True
+                target_user.can_approve_pending = True
+            
+            target_user.save()
+            
+            return Response({
+                "message": f"User role set to {role}",
+                "user": MemberSerializer(target_user).data
+            })
+            
+        except Member.DoesNotExist:
+            return Response({"detail": "User not found"}, status=404)
 
 urlpatterns = [
     path("", home),
@@ -40,6 +100,10 @@ urlpatterns = [
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/me/', MeView.as_view(), name='me'),
+    
+    # Role management endpoints
+    path('auth/promote/', PromoteToSuperAdminView.as_view(), name='promote-superadmin'),
+    path('auth/set-role/', SetUserRoleView.as_view(), name='set-role'),
 
     path('members/', include('members.urls')),
     path('activities/', include('activities.urls')),
