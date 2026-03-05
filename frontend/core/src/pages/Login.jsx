@@ -6,27 +6,6 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Church, Lock, Mail, AlertCircle } from "lucide-react";
 
-const DEMO_CREDENTIALS = [
-  {
-    role: "Super Admin",
-    email: "superadmin@covenantcloud.org",
-    password: "admin123",
-  },
-  { role: "Pastor", email: "pastor@covenantcloud.org", password: "pastor123" },
-  {
-    role: "Treasurer",
-    email: "treasurer@covenantcloud.org",
-    password: "treasurer123",
-  },
-  {
-    role: "Registrar",
-    email: "registrar@covenantcloud.org",
-    password: "registrar123", 
-  },
-  { role: "Elder", email: "elder@covenantcloud.org", password: "elder123" },
-  { role: "Member", email: "member@covenantcloud.org", password: "member123" },
-];
-
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -35,36 +14,33 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showDemo, setShowDemo] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    
+
     // Convert email to username for Django JWT
     const loginData = {
-      username: formData.email,  // Use email as username
-      password: formData.password
+      username: formData.email, // Use email as username
+      password: formData.password,
     };
-    
+
     console.log("Login data:", loginData);
-    
+
     try {
       await login(loginData);
       navigate("/dashboard");
     } catch (err) {
-      const errorMsg = err.response?.data?.detail || err.message || "Invalid credentials. Please check your username and password.";
+      const errorMsg =
+        err.response?.data?.detail ||
+        err.message ||
+        "Invalid credentials. Please check your username and password.";
       console.error("Login error:", err);
       setError(errorMsg);
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDemo = (cred) => {
-    setFormData({ email: cred.email, password: cred.password });
-    setShowDemo(false);
   };
 
   return (
@@ -187,44 +163,12 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Demo credentials */}
-          <div className="mt-6">
-            <button
-              onClick={() => setShowDemo(!showDemo)}
-              className="w-full text-center text-xs text-indigo-400 hover:text-indigo-300 transition"
-            >
-              {showDemo ? "Hide" : "Show"} demo credentials ↓
-            </button>
-
-            {showDemo && (
-              <div className="mt-3 bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-                <p className="text-xs text-indigo-300 px-3 py-2 border-b border-white/10 font-medium">
-                  Click to auto-fill credentials:
-                </p>
-                {DEMO_CREDENTIALS.map((cred) => (
-                  <button
-                    key={cred.role}
-                    onClick={() => fillDemo(cred)}
-                    className="w-full flex items-center justify-between px-3 py-2 hover:bg-white/10 transition text-left"
-                  >
-                    <span className="text-xs font-medium text-white">
-                      {cred.role}
-                    </span>
-                    <span className="text-xs text-indigo-400">
-                      {cred.email}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
           {/* Registration link */}
           <div className="mt-4 text-center">
             <p className="text-xs text-indigo-300">
               Don't have an account?{" "}
-              <a 
-                href="/register" 
+              <a
+                href="/register"
                 className="text-indigo-400 hover:text-indigo-300 font-medium underline"
               >
                 Register here
