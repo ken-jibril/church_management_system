@@ -44,7 +44,7 @@ export default function Register() {
     try {
       await registerUser(formData);
       await login({
-        email: formData.email,
+        username: formData.username,  // Use username, not email!
         password: formData.password,
       });
       navigate("/dashboard");
