@@ -10,10 +10,15 @@ const AuthContext = createContext();
 
 /**
  * Map backend Member fields → frontend role string used by RBAC.
+ * Backend provides role field directly now, but we keep this as fallback.
  * Backend flags: is_super_admin, is_parish_minister, is_kirk_session
  * Frontend roles: superadmin | pastor | elder | member
  */
 const deriveRole = (member) => {
+  // Prefer backend-computed role if available
+  if (member.role) return member.role;
+
+  // Fallback to deriving from flags
   if (member.is_super_admin || member.is_superuser) return "superadmin";
   if (member.is_parish_minister) return "pastor";
   if (member.is_kirk_session) return "elder";
@@ -29,7 +34,7 @@ const normaliseMember = (raw) => ({
   email: raw.email,
   username: raw.username,
   phone: raw.phone_number || "",
-  role: deriveRole(raw),
+  role: deriveRole(raw), // Use deriveRole which now prefers backend-computed role
   // keep raw flags for fine-grained checks
   is_super_admin: raw.is_super_admin,
   is_parish_minister: raw.is_parish_minister,
