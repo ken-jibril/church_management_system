@@ -21,7 +21,7 @@ const DEMO_CREDENTIALS = [
   {
     role: "Registrar",
     email: "registrar@covenantcloud.org",
-    password: "registrar123",
+    password: "registrar123", 
   },
   { role: "Elder", email: "elder@covenantcloud.org", password: "elder123" },
   { role: "Member", email: "member@covenantcloud.org", password: "member123" },
@@ -91,10 +91,10 @@ const Login = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
+            {/* Username */}
             <div>
               <label className="block text-sm font-medium text-indigo-200 mb-1.5">
-                Email Address
+                Username
               </label>
               <div className="relative">
                 <Mail
@@ -102,12 +102,12 @@ const Login = () => {
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400"
                 />
                 <input
-                  type="email"
+                  type="text"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  placeholder="Enter your email"
+                  placeholder="Enter your username"
                   required
                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm"
                 />
