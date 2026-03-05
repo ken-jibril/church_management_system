@@ -4,8 +4,8 @@ from .views import MemberRegistrationViewSet, MemberViewSet
 from django.urls import path, include
 
 router = DefaultRouter()
-router.register(r'members', MemberRegistrationViewSet, basename='members')
-router.register(r'all', MemberViewSet, basename='all-members')
+router.register(r'register', MemberRegistrationViewSet, basename='register')
+router.register(r'members', MemberViewSet, basename='members')
 
 urlpatterns = [
     path("", include(router.urls)),
