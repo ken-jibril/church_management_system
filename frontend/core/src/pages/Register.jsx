@@ -35,6 +35,12 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    
+    // Debug: Show what we're sending
+    const debugMsg = `Sending to backend:\nusername: "${formData.username}"\nemail: "${formData.email}"\npassword: "${formData.password ? '***' : 'MISSING'}"`;
+    console.log(debugMsg);
+    alert(debugMsg);
+    
     try {
       await registerUser(formData);
       await login({
@@ -43,6 +49,8 @@ export default function Register() {
       });
       navigate("/dashboard");
     } catch (err) {
+      const errorDetails = err.response?.data ? JSON.stringify(err.response.data, null, 2) : err.message;
+      alert(`Registration Error: ${errorDetails}`);
       setError(
         err.response?.data?.detail ||
           "Registration failed. Please check your details and try again.",
