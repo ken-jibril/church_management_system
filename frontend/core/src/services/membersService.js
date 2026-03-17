@@ -3,12 +3,12 @@
  * Wraps all /members/ and /activities/new-members/ API calls.
  *
  * Backend endpoints:
- *   GET    /members/all/           → list all members
- *   POST   /members/all/           → create member
- *   GET    /members/all/{id}/      → retrieve member
- *   PUT    /members/all/{id}/      → update member
- *   PATCH  /members/all/{id}/      → partial update
- *   DELETE /members/all/{id}/      → delete member (super admin only)
+ *   GET    /members/              → list all members
+ *   POST   /members/              → create member
+ *   GET    /members/{id}/         → retrieve member
+ *   PUT    /members/{id}/         → update member
+ *   PATCH  /members/{id}/         → partial update
+ *   DELETE /members/{id}/         → delete member (super admin only)
  *
  *   GET    /activities/new-members/           → list pending registrations
  *   POST   /activities/new-members/           → submit new registration
@@ -65,28 +65,28 @@ const deriveRole = (raw) => {
 // ── CRUD ─────────────────────────────────────────────────────────────────────
 
 export const getMembers = async () => {
-  const res = await api.get("/members/all/");
+  const res = await api.get("/members/");
   const data = Array.isArray(res.data) ? res.data : res.data.results || [];
   return data.map(normaliseMember);
 };
 
 export const getMember = async (id) => {
-  const res = await api.get(`/members/all/${id}/`);
+  const res = await api.get(`/members/${id}/`);
   return normaliseMember(res.data);
 };
 
 export const createMember = async (payload) => {
-  const res = await api.post("/members/all/", payload);
+  const res = await api.post("/members/", payload);
   return normaliseMember(res.data);
 };
 
 export const updateMember = async (id, payload) => {
-  const res = await api.patch(`/members/all/${id}/`, payload);
+  const res = await api.patch(`/members/${id}/`, payload);
   return normaliseMember(res.data);
 };
 
 export const deleteMember = async (id) => {
-  await api.delete(`/members/all/${id}/`);
+  await api.delete(`/members/${id}/`);
 };
 
 // ── Pending Registrations ─────────────────────────────────────────────────────

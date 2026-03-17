@@ -1,33 +1,45 @@
 /**
  * Giving Service
- * NOTE: Backend does not yet have a giving endpoint.
- * Uses in-memory mock data. Replace with real API calls when available.
+ * Connects to backend API at /donations/giving/
  */
-import { mockGiving as _seed } from "./mockData";
+import api from "../api/axios";
 
-let _store = [..._seed];
-
-export const getGiving = async () => [..._store];
+export const getGiving = async () => {
+  try {
+    const res = await api.get("/donations/giving/");
+    const data = Array.isArray(res.data) ? res.data : res.data.results || [];
+    return data;
+  } catch (error) {
+    console.error("Error fetching giving:", error);
+    return [];
+  }
+};
 
 export const createGiving = async (payload) => {
-  const item = {
-    ...payload,
-    id: Date.now(),
-    amount: parseFloat(payload.amount) || 0,
-  };
-  _store = [item, ..._store];
-  return item;
+  try {
+    const res = await api.post("/donations/giving/", payload);
+    return res.data;
+  } catch (error) {
+    console.error("Error creating giving:", error);
+    throw error;
+  }
 };
 
 export const updateGiving = async (id, payload) => {
-  _store = _store.map((g) =>
-    g.id === id
-      ? { ...g, ...payload, amount: parseFloat(payload.amount) || g.amount }
-      : g,
-  );
-  return _store.find((g) => g.id === id);
+  try {
+    const res = await api.patch(`/donations/giving/${id}/`, payload);
+    return res.data;
+  } catch (error) {
+    console.error("Error updating giving:", error);
+    throw error;
+  }
 };
 
 export const deleteGiving = async (id) => {
-  _store = _store.filter((g) => g.id !== id);
+  try {
+    await api.delete(`/donations/giving/${id}/`);
+  } catch (error) {
+    console.error("Error deleting giving:", error);
+    throw error;
+  }
 };

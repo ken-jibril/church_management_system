@@ -105,6 +105,9 @@ urlpatterns = [
     path('auth/promote/', PromoteToSuperAdminView.as_view(), name='promote-superadmin'),
     path('auth/set-role/', SetUserRoleView.as_view(), name='set-role'),
 
+    # App-specific endpoints
     path('members/', include('members.urls')),
     path('activities/', include('activities.urls')),
+    path('groups/', include('groups.urls')),
+    path('donations/', include('donations.urls')),
 ]

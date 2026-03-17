@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'groups',
     'members',
     'activities',
+    'donations',
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',

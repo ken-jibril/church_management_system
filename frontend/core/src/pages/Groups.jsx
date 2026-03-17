@@ -75,13 +75,32 @@ export default function Groups() {
       const data = await getGroups();
       setGroups(data);
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message || "Failed to load groups.");
+      setError(
+        err?.response?.data?.detail || err.message || "Failed to load groups.",
+      );
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { loadGroups(); }, [loadGroups]);
+  useEffect(() => {
+    loadGroups();
+  }, [loadGroups]);
+
+  // Stable handlers for form field changes
+  const handleFormChange = useCallback(
+    (field) => (e) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    },
+    [],
+  );
+
+  const handleCheckboxChange = useCallback(
+    (field) => (e) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.checked }));
+    },
+    [],
+  );
 
   const isAdmin = [
     "superadmin",
@@ -135,22 +154,11 @@ export default function Groups() {
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Group Name *
-        </label>
-        <input
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          placeholder="Group name"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
           Description
         </label>
         <textarea
           value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          onChange={handleFormChange("description")}
           rows={2}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
           placeholder="Group description..."
@@ -163,7 +171,7 @@ export default function Groups() {
           </label>
           <input
             value={form.patron}
-            onChange={(e) => setForm({ ...form, patron: e.target.value })}
+            onChange={handleFormChange("patron")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Patron name"
           />
@@ -174,7 +182,7 @@ export default function Groups() {
           </label>
           <input
             value={form.chairperson}
-            onChange={(e) => setForm({ ...form, chairperson: e.target.value })}
+            onChange={handleFormChange("chairperson")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Chairperson name"
           />
@@ -185,9 +193,7 @@ export default function Groups() {
           </label>
           <input
             value={form.vice_chairperson}
-            onChange={(e) =>
-              setForm({ ...form, vice_chairperson: e.target.value })
-            }
+            onChange={handleFormChange("vice_chairperson")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Vice Chairperson name"
           />
@@ -198,7 +204,7 @@ export default function Groups() {
           </label>
           <input
             value={form.secretary}
-            onChange={(e) => setForm({ ...form, secretary: e.target.value })}
+            onChange={handleFormChange("secretary")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Secretary name"
           />
@@ -209,9 +215,7 @@ export default function Groups() {
           </label>
           <input
             value={form.vice_secretary}
-            onChange={(e) =>
-              setForm({ ...form, vice_secretary: e.target.value })
-            }
+            onChange={handleFormChange("vice_secretary")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Vice Secretary name"
           />
@@ -222,7 +226,7 @@ export default function Groups() {
           </label>
           <input
             value={form.treasurer}
-            onChange={(e) => setForm({ ...form, treasurer: e.target.value })}
+            onChange={handleFormChange("treasurer")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Treasurer name"
           />
@@ -233,7 +237,7 @@ export default function Groups() {
           </label>
           <input
             value={form.meetingDay}
-            onChange={(e) => setForm({ ...form, meetingDay: e.target.value })}
+            onChange={handleFormChange("meetingDay")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="e.g. Every Saturday"
           />
@@ -244,7 +248,7 @@ export default function Groups() {
           </label>
           <input
             value={form.meetingTime}
-            onChange={(e) => setForm({ ...form, meetingTime: e.target.value })}
+            onChange={handleFormChange("meetingTime")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="e.g. 10:00 AM"
           />
@@ -256,7 +260,7 @@ export default function Groups() {
             type="checkbox"
             id="isPCMF"
             checked={form.isPCMF}
-            onChange={(e) => setForm({ ...form, isPCMF: e.target.checked })}
+            onChange={handleCheckboxChange("isPCMF")}
             className="w-4 h-4 text-indigo-600 rounded"
           />
           <label htmlFor="isPCMF" className="text-sm text-gray-700">
@@ -271,9 +275,7 @@ export default function Groups() {
           </label>
           <input
             value={form.vice_treasurer}
-            onChange={(e) =>
-              setForm({ ...form, vice_treasurer: e.target.value })
-            }
+            onChange={handleFormChange("vice_treasurer")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Vice Treasurer name"
           />

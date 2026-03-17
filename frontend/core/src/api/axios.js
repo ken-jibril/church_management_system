@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// Use direct backend URL for now (bypassing proxy to test)
-const API_BASE_URL = "https://church-management-system-k7bt.onrender.com";
+// Use environment variable for API base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 console.log("API Base URL:", API_BASE_URL);
 

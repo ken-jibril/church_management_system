@@ -2,7 +2,7 @@
  * Members Management Page - Covenant Cloud Church Management System
  * Uses real backend API via membersService.
  */
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Users,
   Plus,
@@ -95,8 +95,23 @@ export default function Members() {
     return matchSearch && matchRole && matchStatus;
   });
 
+  // Stable handler for form field changes
+  const handleFormChange = useCallback(
+    (field) => (e) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    },
+    [],
+  );
+
+  // Stable handler for checkbox changes
+  const handleCheckboxChange = useCallback(
+    (field) => (e) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.checked }));
+    },
+    [],
+  );
+
   const handleAdd = async () => {
-    setSaving(true);
     setSaveError(null);
     try {
       // Build payload for backend
@@ -210,7 +225,7 @@ export default function Members() {
           </label>
           <input
             value={form.first_name}
-            onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+            onChange={handleFormChange("first_name")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="First name"
             required
@@ -222,7 +237,7 @@ export default function Members() {
           </label>
           <input
             value={form.last_name}
-            onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+            onChange={handleFormChange("last_name")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Last name"
             required
@@ -235,7 +250,7 @@ export default function Members() {
           <input
             type="email"
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            onChange={handleFormChange("email")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="email@example.com"
           />
@@ -246,7 +261,7 @@ export default function Members() {
           </label>
           <input
             value={form.phone_number}
-            onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
+            onChange={handleFormChange("phone_number")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="+254 7XX XXX XXX"
           />
@@ -259,7 +274,7 @@ export default function Members() {
               </label>
               <input
                 value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                onChange={handleFormChange("username")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="username"
               />
@@ -271,7 +286,7 @@ export default function Members() {
               <input
                 type="password"
                 value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                onChange={handleFormChange("password")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="Min 8 characters"
               />
@@ -284,7 +299,7 @@ export default function Members() {
           </label>
           <select
             value={form.gender}
-            onChange={(e) => setForm({ ...form, gender: e.target.value })}
+            onChange={handleFormChange("gender")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option>Male</option>
@@ -298,7 +313,7 @@ export default function Members() {
           <input
             type="date"
             value={form.dob}
-            onChange={(e) => setForm({ ...form, dob: e.target.value })}
+            onChange={handleFormChange("dob")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
@@ -320,17 +335,16 @@ export default function Members() {
               const v = e.target.value;
               setForm({
                 ...form,
-                is_super_admin: v === "superadmin",
-                is_parish_minister: v === "pastor",
-                is_kirk_session: v === "elder",
+                is_super_admin: false, // Only super admin can set this
+                is_parish_minister: v === "Parish Minister",
+                is_kirk_session: v === "Elder",
               });
             }}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="member">Member</option>
-            <option value="elder">Elder (Kirk Session)</option>
-            <option value="pastor">Pastor (Parish Minister)</option>
-            <option value="superadmin">Super Admin</option>
+            <option value="elder">Elder</option>
+            <option value="pastor">Parish Minister</option>
           </select>
         </div>
         <div>
@@ -340,7 +354,10 @@ export default function Members() {
           <select
             value={form.is_active ? "active" : "inactive"}
             onChange={(e) =>
-              setForm({ ...form, is_active: e.target.value === "active" })
+              setForm((prev) => ({
+                ...prev,
+                is_active: e.target.value === "active",
+              }))
             }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
@@ -354,7 +371,7 @@ export default function Members() {
           </label>
           <input
             value={form.group}
-            onChange={(e) => setForm({ ...form, group: e.target.value })}
+            onChange={handleFormChange("group")}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="e.g. Youth Fellowship"
           />
@@ -366,7 +383,7 @@ export default function Members() {
         </label>
         <input
           value={form.address}
-          onChange={(e) => setForm({ ...form, address: e.target.value })}
+          onChange={handleFormChange("address")}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           placeholder="Physical address"
         />
@@ -376,7 +393,7 @@ export default function Members() {
           type="checkbox"
           id="baptized"
           checked={form.baptized}
-          onChange={(e) => setForm({ ...form, baptized: e.target.checked })}
+          onChange={handleCheckboxChange("baptized")}
           className="w-4 h-4 text-indigo-600 rounded"
         />
         <label htmlFor="baptized" className="text-sm text-gray-700">
@@ -469,8 +486,7 @@ export default function Members() {
             className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="all">All Roles</option>
-            <option value="superadmin">Super Admin</option>
-            <option value="pastor">Pastor</option>
+            <option value="pastor">Parish Minister</option>
             <option value="elder">Elder</option>
             <option value="member">Member</option>
           </select>
