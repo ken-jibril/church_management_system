@@ -9,3 +9,4 @@ django-cors-headers
 djangorestframework-simplejwt
 dj-database-url
 python-dotenv
+pymysql
