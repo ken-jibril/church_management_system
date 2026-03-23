@@ -34,7 +34,7 @@ SECRET_KEY = 'django-insecure-+0dm24h7s6v%)3389d*a@m3hbeo^*x$%2^q4mi#w#v9^$4qf%3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "church-management-system-k7bt.onrender.com", "*.onrender.com"]
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 
@@ -108,13 +108,35 @@ if DATABASE_URL:
         "default": dj_database_url.parse(DATABASE_URL)
     }
 else:
-    # Fallback to SQLite for local development
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+    # Check for MySQL environment variables (for PythonAnywhere or local MySQL)
+    MYSQL_DB = os.environ.get("MYSQL_DB")
+    MYSQL_USER = os.environ.get("MYSQL_USER")
+    MYSQL_PASSWORD = os.environ.get("MYSQL_PASSWORD")
+    MYSQL_HOST = os.environ.get("MYSQL_HOST", "localhost")
+    MYSQL_PORT = os.environ.get("MYSQL_PORT", "3306")
+
+    if MYSQL_DB and MYSQL_USER and MYSQL_PASSWORD:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": MYSQL_DB,
+                "USER": MYSQL_USER,
+                "PASSWORD": MYSQL_PASSWORD,
+                "HOST": MYSQL_HOST,
+                "PORT": MYSQL_PORT,
+                "OPTIONS": {
+                    "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                },
+            }
         }
-    }
+    else:
+        # Fallback to SQLite for local development
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
 
 
 
@@ -137,17 +159,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://church-management-system-k7bt.onrender.com",
-]
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174").split(",")
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "https://church-management-system-k7bt.onrender.com",
-    "http://localhost:5174",
-]
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost:5173,http://localhost:5174").split(",")
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
