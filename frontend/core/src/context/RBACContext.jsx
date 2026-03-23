@@ -73,7 +73,10 @@ export const PERMISSIONS = {
       ROLES.REGISTRAR,
       ROLES.DEPUTY_REGISTRAR,
     ],
-    delete: [ROLES.SUPER_ADMIN, ROLES.ADMIN],
+    delete: [
+      ROLES.SUPER_ADMIN, 
+      ROLES.ADMIN
+    ],
   },
   // Donations module
   donations: {
