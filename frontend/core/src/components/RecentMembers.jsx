@@ -6,7 +6,7 @@ const RecentMembers = ({ members }) => {
       </h2>
 
       {members.length === 0 ? (
-        <p className="text-sm text-gray-500">No members found</p>
+        <p className="text-sm text-blue-500">No members found</p>
       ) : (
         <ul className="space-y-3">
           {members.slice(0, 5).map((member) => (

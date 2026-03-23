@@ -6,7 +6,7 @@ const RecentActivities = ({ activities }) => {
       </h2>
 
       {activities.length === 0 ? (
-        <p className="text-sm text-gray-500">No activities available</p>
+        <p className="text-sm text-blue-500">No activities available</p>
       ) : (
         <ul className="space-y-3">
           {activities.slice(0, 5).map((activity) => (
